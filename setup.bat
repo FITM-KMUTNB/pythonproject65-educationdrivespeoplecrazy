@@ -1,3 +1,4 @@
 py -m venv .
-./Scripts/python.exe -m pip install --upgrade pip
-./Scripts/pip.exe install -r requirements.txt
+Scripts\activate.bat
+py -m pip install -r requirements.txt
+pip install -r requirements.txt
