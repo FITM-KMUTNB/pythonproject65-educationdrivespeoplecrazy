@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Bootstrap CSS -->
+    <link id="theme-link" rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" crossorigin="anonymous">
+
+    <!-- Game CSS -->
+    <link rel="stylesheet" href="css/game.css">
+
+    <!-- Theme switch -->
+    <!-- <script src="js/theme.js"></script> -->
+
+    <title>Document</title>
+</head>
+
+<body>
+    <nav class="navbar navbar-dark bg-dark navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="#">Typing test</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar"
+                aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="mainNavbar">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0" id="jsMainNavbar">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Leaderboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">History</a>
+                    </li>
+                </ul>
+                <form class="d-flex">
+                    <input class="form-control me-2" id="username" type="text" placeholder="Guest">
+                    <button class="btn btn-success" type="button">Save</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <h4 style="text-align: center;">Typing test</h4>
+        <ul class="nav nav-tabs mt-4">
+            <li class="nav-item">
+                <a href="#" id="mode-30s" class="nav-link active">Time 30s</a>
+            </li>
+            <li class="nav-item">
+                <a href="#" id="mode-60s" class="nav-link">Time 60s</a>
+            </li>
+            <li class="nav-item">
+                <a href="#" id="mode-words" class="nav-link">Words</a>
+            </li>
+            <li class="nav-item">
+                <a href="#" id="mode-quote" class="nav-link">Quote</a>
+            </li>
+        </ul>
+        <div class="border-1 p-3">
+            <span class="word text-warning d-none" id="time">30</span>
+            <span class="word text-warning d-none">
+                <span id="words"></span>
+                <span id="total-words"></span>
+            </span>
+            <div id="game" style="min-height: 200px;"></div>
+        </div>
+        <input type="text" id="input-text" class="form-control">
+    </div>
+
+    <!-- Eel JS -->
+    <script src="eel.js"></script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+
+    <!-- Game JS -->
+    <script src="js/game.js"></script>
+
+    <!-- User JS -->
+    <script src="js/user.js"></script>
+</body>
+
+</html>

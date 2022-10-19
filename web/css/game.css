@@ -1,0 +1,17 @@
+.word {
+    font-size: 24px;
+    color: darkgray;
+}
+
+.word-active {
+    color: #000;
+    font-weight: 500;
+}
+
+.word-correct {
+    color: green;
+}
+
+.word-incorrect {
+    color: red;
+}
