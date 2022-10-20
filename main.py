@@ -2,13 +2,7 @@ from os import system
 from random import choice
 import eel
 
-# eel.init('web')
-
-# @eel.expose
-# def getQuote():
-#     return "Hello from Python!"
-
-# eel.start('index.html', size=(800, 600))
+eel.init('web')
 
 # Stort 20
 # Medium 60
@@ -47,27 +41,34 @@ def getQuoteLength():
 
 short, medium, long, thicc = getQuoteLength()
 
+@eel.expose
 def getShortQuote():
-    print(len(short))
+    # print(len(short))
     quote = choice(short)
-    return quote, len(quote.split(" "))
+    return quote
 
+@eel.expose
 def getMediumQuote():
-    print(len(medium))
+    # print(len(medium))
     quote = choice(medium)
-    return quote, len(quote.split(" "))
+    return quote
 
+@eel.expose
 def getLongQuote():
-    print(len(long))
+    # print(len(long))
     quote = choice(long)
-    return quote, len(quote.split(" "))
+    return quote
 
+@eel.expose
 def getThiccQuote():
-    print(len(thicc))
+    # print(len(thicc))
     quote = choice(thicc)
-    return quote, len(quote.split(" "))
+    return quote
 
-print("Short:", getShortQuote())
-print("Medium:", getMediumQuote())
-print("Long:", getLongQuote())
-print("Thicc:", getThiccQuote())
+@eel.expose
+def resultCalc(correctChars, totalChars, time):
+    wpm = (correctChars / 5) / (time / 60)
+    accurary = (correctChars / totalChars) * 100
+    return wpm, accurary
+
+eel.start('index.html', size=(800, 600), mode=None)
