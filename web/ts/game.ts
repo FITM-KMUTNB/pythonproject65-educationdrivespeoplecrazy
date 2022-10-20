@@ -11,7 +11,7 @@ const gameController: GameController = {
     tempQuote: "",
     tempChar: [],
     time: 0,
-    timeInterval: 0,
+    timeInterval: -1,
     start: false
 }
 
@@ -32,6 +32,7 @@ modeSelectorList.map(mode => {
         }
         modeSelector[mode].classList.add("active");
         gameController.mode = mode;
+        gameSetup();
     });
 });
 
@@ -41,21 +42,31 @@ const gameInputElement = document.getElementById("game-input") as HTMLInputEleme
 gameInputElement.onfocus = () => {
     modeSelectorList.map(mode => {
         modeSelector[mode].classList.add("disabled");
-        modeSelector[mode].ariaDisabled = "true";
     });
 
     const tempChar = document.getElementById(`char-${gameController.totalChar}`) as HTMLElement;
     tempChar.classList.add("word-active");
 
-    gameController.timeInterval = setInterval(() => {
-        if(gameController.start) {
-            gameController.time++;
-        }
-    }, 1000);
+    if (gameController.timeInterval <= 0) {
+        gameController.timeInterval = setInterval(() => {
+            if (gameController.start) {
+                gameController.time++;
+            }
+        }, 1000);
+    }
+}
+
+gameInputElement.onblur = () => {
+    modeSelectorList.map(mode => {
+        modeSelector[mode].classList.remove("disabled");
+    });
+    gameController.start = false;
 }
 
 gameInputElement.onkeydown = (e) => {
-    gameController.start = true;
+    if (!gameController.start && (e.key !== ("Backspace" || "Shift"))) {
+        gameController.start = true;
+    }
     const tempChar = document.getElementById(`char-${gameController.totalChar}`) as HTMLElement;
 
     const tempCharR1 = document.getElementById(`char-${gameController.totalChar - 1}`) as HTMLElement | null;
@@ -66,17 +77,20 @@ gameInputElement.onkeydown = (e) => {
         tempChar1.classList.add("word-active");
     }
 
-    if (gameController.totalChar === gameController.baseChar) {
-        gameController.start = false;
-        clearInterval(gameController.timeInterval);
-        console.log("Game Over", eel.resultCalc(gameController.correctChar, gameController.baseChar, gameController.time)());
+    if (gameController.totalChar + 1 === gameController.baseChar) {
+        gameFinish();
         return;
-    }else {
+    } else {
         if (e.key === "Backspace") {
             if (gameController.totalChar === 0) return;
-            gameController.correctChar--;
-            gameController.incorrectChar--;
             gameController.totalChar--;
+
+            if (tempCharR1.classList.value.includes("word-correct")) {
+                gameController.correctChar--;
+            } else {
+                gameController.incorrectChar--;
+            }
+
             tempCharR1.classList.remove("word-correct");
             tempCharR1.classList.remove("word-incorrect");
             tempChar.classList.remove("word-active");
@@ -94,6 +108,49 @@ gameInputElement.onkeydown = (e) => {
             gameController.totalChar++;
         }
     }
+}
+
+async function gameFinish() {
+    const lastestGame = { ...gameController }
+
+    gameController.start = false;
+    clearInterval(gameController.timeInterval);
+
+    modeSelectorList.map(mode => {
+        modeSelector[mode].classList.remove("disabled");
+    });
+
+    const result: number[] = await eel.resultCalc(gameController.correctChar, gameController.baseChar, gameController.time)();
+
+    gameController.time = 0;
+    gameController.correctChar = 0;
+    gameController.incorrectChar = 0;
+    gameController.totalChar = 0;
+    gameController.baseChar = 0;
+    gameController.timeInterval = -1;
+    
+    gameElement.innerHTML = "";
+    gameInputElement.value = "";
+    gameInputElement.disabled = true;
+
+    const resultElement = document.createElement("div");
+    resultElement.classList.value = "d-flex flex-column justify-content-center align-content-center";
+    resultElement.innerHTML = "<h4>Result</h4>";
+
+    const wpmElement = document.createElement("span");
+    wpmElement.innerText = `WPM: ${String(result[0]).slice(0, 5)}`;
+
+    const accuracyElement = document.createElement("span");
+    accuracyElement.innerText = `Accuracy: ${result[1]}%`;
+
+    const timeElement = document.createElement("span");
+    timeElement.innerText = `Time: ${lastestGame.time}s`;
+
+    resultElement.appendChild(wpmElement);
+    resultElement.appendChild(accuracyElement);
+    resultElement.appendChild(timeElement);
+
+    gameElement.appendChild(resultElement);
 }
 
 async function gameSetup() {
@@ -117,9 +174,12 @@ async function gameSetup() {
 
     gameElement.innerHTML = "";
     gameInputElement.value = "";
-    gameController.baseChar = 0;
+    gameController.time = 0;
     gameController.correctChar = 0;
     gameController.incorrectChar = 0;
+    gameController.totalChar = 0;
+    gameController.baseChar = 0;
+    gameController.timeInterval = -1;
 
     const chars = String(gameController.tempQuote).split("");
     chars.map(char => {
@@ -132,4 +192,4 @@ async function gameSetup() {
     });
 }
 
-document.onload = gameSetup;
+(gameSetup)()

@@ -66,7 +66,7 @@ def getThiccQuote():
     return quote
 
 @eel.expose
-def resultCalc(correctChars, totalChars, time):
+def resultCalc(correctChars: int, totalChars: int, time: int):
     wpm = (correctChars / 5) / (time / 60)
     accurary = (correctChars / totalChars) * 100
     return wpm, accurary
