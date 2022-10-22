@@ -1,18 +1,37 @@
 .word {
     font-size: 24px;
-    color: darkgray;
+    font-family: 'Roboto Mono', monospace;
+    color: gainsboro;
 }
 
 .word-active {
-    color: #000;
-    font-weight: 500;
+    -webkit-animation: wordActive 850ms infinite;
+    -moz-animation: wordActive 850ms infinite;
+    -o-animation: wordActive 850ms infinite;
+    animation: wordActive 850ms infinite;
+}
+
+@-webkit-keyframes wordActive {
+
+    0%,
+    49% {
+        background-color: gold;
+        color: black;
+    }
+
+    50%,
+    100% {
+        background-color: rgba(0, 0, 0, 0);
+        color: white;
+    }
 }
 
 .word-correct {
-    color: green;
+    color: #22ca7c;
+    /* background-color: green; */
 }
 
 .word-incorrect {
-    /* color: red; */
+    color: white;
     background-color: red;
 }

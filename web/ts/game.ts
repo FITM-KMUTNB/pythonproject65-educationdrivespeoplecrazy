@@ -1,4 +1,4 @@
-import { GameController, ModeSelectorList } from "./types.game";
+import { GameController, Mode, ModeSelector } from "./types.game"
 
 let eel: any
 
@@ -15,181 +15,196 @@ const gameController: GameController = {
     start: false
 }
 
-const modeSelector = {
+const quote = {
+    short: () => eel.getShortQuote()(),
+    medium: () => eel.getMediumQuote()(),
+    long: () => eel.getLongQuote()(),
+    thicc: () => eel.getThiccQuote()()
+}
+
+const modeSelector: ModeSelector = {
     short: document.getElementById("mode-short") as HTMLElement,
     medium: document.getElementById("mode-medium") as HTMLElement,
     long: document.getElementById("mode-long") as HTMLElement,
     thicc: document.getElementById("mode-thicc") as HTMLElement,
+    selector: ["short", "medium", "long", "thicc"]
 }
 
-const modeSelectorList: ModeSelectorList = ["short", "medium", "long", "thicc"];
-
-modeSelectorList.map(mode => {
-    modeSelector[mode].addEventListener("click", () => {
-        gameController.mode = mode;
-        for(let tempMode in modeSelectorList) {
-            modeSelector[modeSelectorList[tempMode]].classList.remove("active");
-        }
+modeSelector.selector.map(mode => {
+    modeSelector[mode].addEventListener("click", async () => {
+        gameController.mode = mode as Mode;
+        modeSelector.selector.map(mode => modeSelector[mode].classList.remove("active"));
         modeSelector[mode].classList.add("active");
-        gameController.mode = mode;
         gameSetup();
     });
 });
 
+["btn-restart", "restart-btn"].map(id => {
+    document.getElementById(id).addEventListener("click", () => {
+        gameSetup();
+    });
+});
+
+const gameContainerElement = document.getElementById("game-container") as HTMLElement;
+const resultElement = document.getElementById("result") as HTMLElement;
+
 const gameElement = document.getElementById("game") as HTMLElement;
 const gameInputElement = document.getElementById("game-input") as HTMLInputElement;
 
-gameInputElement.onfocus = () => {
-    modeSelectorList.map(mode => {
-        modeSelector[mode].classList.add("disabled");
+async function gameSetup() {
+    gameReset();
+    gameController.tempQuote = await quote[gameController.mode]();
+    gameController.tempChar = String(gameController.tempQuote).split("");
+
+    gameController.tempChar.map((char, index) => {
+        const charElement = document.createElement("span");
+        charElement.id = `char-${index}`;
+        charElement.classList.add("word");
+        charElement.innerText = char;
+        gameElement.appendChild(charElement);
+        gameController.baseChar += 1;
     });
 
-    const tempChar = document.getElementById(`char-${gameController.totalChar}`) as HTMLElement;
-    tempChar.classList.add("word-active");
+    gameInputElement.focus();
+    document.getElementById("char-0").classList.add("word-active");
+}
 
+function gameInterveal() {
     if (gameController.timeInterval <= 0) {
         gameController.timeInterval = setInterval(() => {
             if (gameController.start) {
                 gameController.time++;
             }
         }, 1000);
+        // window.localStorage.setItem(gameController.timeInterval.toString(), gameController.timeInterval.toString());
     }
 }
 
-gameInputElement.onblur = () => {
-    modeSelectorList.map(mode => {
-        modeSelector[mode].classList.remove("disabled");
-    });
+function gamePause() {
     gameController.start = false;
+    clearInterval(gameController.timeInterval);
+    gameController.timeInterval = -1;
 }
 
-gameInputElement.onkeydown = (e) => {
-    if (!gameController.start && (e.key !== ("Backspace" || "Shift"))) {
-        gameController.start = true;
-    }
-    const tempChar = document.getElementById(`char-${gameController.totalChar}`) as HTMLElement;
+function gameResume() {
+    gameController.start = true;
+    gameInterveal();
+}
 
-    const tempCharR1 = document.getElementById(`char-${gameController.totalChar - 1}`) as HTMLElement | null;
+function gameReset() {
+    gameElement.innerHTML = "";
+    gameInputElement.value = "";
+    gameInputElement.disabled = false;
 
-    const tempChar1 = document.getElementById(`char-${gameController.totalChar + 1}`);
+    // window.localStorage.clear();
 
-    if (tempChar1 != null) {
-        tempChar1.classList.add("word-active");
-    }
+    gameController.baseChar = 0;
+    gameController.correctChar = 0;
+    gameController.incorrectChar = 0;
+    gameController.totalChar = 0;
+    gameController.tempQuote = "";
+    gameController.tempChar = [];
+    gameController.time = 0;
+    gameController.timeInterval = -1;
+    gameController.start = false;
 
-    if (gameController.totalChar + 1 === gameController.baseChar) {
-        gameFinish();
-        return;
-    } else {
-        if (e.key === "Backspace") {
-            if (gameController.totalChar === 0) return;
-            gameController.totalChar--;
-
-            if (tempCharR1.classList.value.includes("word-correct")) {
-                gameController.correctChar--;
-            } else {
-                gameController.incorrectChar--;
-            }
-
-            tempCharR1.classList.remove("word-correct");
-            tempCharR1.classList.remove("word-incorrect");
-            tempChar.classList.remove("word-active");
-            if (tempChar1 != null) tempChar1.classList.remove("word-active");
-            return;
-        }
-
-        if (e.key === tempChar.innerText) {
-            tempChar.classList.add("word-correct");
-            gameController.correctChar++;
-            gameController.totalChar++;
-        } else if (e.key !== "Shift") {
-            tempChar.classList.add("word-incorrect");
-            gameController.incorrectChar++;
-            gameController.totalChar++;
-        }
-    }
+    gameContainerElement.classList.remove("d-none");
+    resultElement.classList.add("d-none");
 }
 
 async function gameFinish() {
-    const lastestGame = { ...gameController }
+    gameContainerElement.classList.add("d-none");
+    resultElement.classList.remove("d-none");
 
-    gameController.start = false;
-    clearInterval(gameController.timeInterval);
+    const { correctChar, incorrectChar, time } = gameController;
 
-    modeSelectorList.map(mode => {
-        modeSelector[mode].classList.remove("disabled");
-    });
-
-    const result: number[] = await eel.resultCalc(gameController.correctChar, gameController.baseChar, gameController.time)();
-
-    gameController.time = 0;
-    gameController.correctChar = 0;
-    gameController.incorrectChar = 0;
-    gameController.totalChar = 0;
-    gameController.baseChar = 0;
-    gameController.timeInterval = -1;
+    const [wpm, accuracy, cpm] = await eel.resultCalc(correctChar, (correctChar + incorrectChar), time)();
     
-    gameElement.innerHTML = "";
-    gameInputElement.value = "";
-    gameInputElement.disabled = true;
-
-    const resultElement = document.createElement("div");
-    resultElement.classList.value = "d-flex flex-column justify-content-center align-content-center";
-    resultElement.innerHTML = "<h4>Result</h4>";
-
-    const wpmElement = document.createElement("span");
-    wpmElement.innerText = `WPM: ${String(result[0]).slice(0, 5)}`;
-
-    const accuracyElement = document.createElement("span");
-    accuracyElement.innerText = `Accuracy: ${result[1]}%`;
-
-    const timeElement = document.createElement("span");
-    timeElement.innerText = `Time: ${lastestGame.time}s`;
-
-    resultElement.appendChild(wpmElement);
-    resultElement.appendChild(accuracyElement);
-    resultElement.appendChild(timeElement);
-
-    gameElement.appendChild(resultElement);
-}
-
-async function gameSetup() {
-    let quotesTemp: Promise<string>;
-    switch(gameController.mode) {
-        case "short":
-            quotesTemp = await eel.getShortQuote()();
-            break;
-        case "medium":
-            quotesTemp = await eel.getMediumQuote()();
-            break;
-        case "long":
-            quotesTemp = await eel.getLongQuote()();
-            break;
-        case "thicc":
-            quotesTemp = await eel.getThiccQuote()();
-            break;
+    const user = window.localStorage.getItem("user")
+    if(user !== null) {
+        await eel.updateUserHistory(user, wpm, accuracy, cpm)();
     }
 
-    gameController.tempQuote = await quotesTemp;
-
-    gameElement.innerHTML = "";
-    gameInputElement.value = "";
-    gameController.time = 0;
-    gameController.correctChar = 0;
-    gameController.incorrectChar = 0;
-    gameController.totalChar = 0;
-    gameController.baseChar = 0;
-    gameController.timeInterval = -1;
-
-    const chars = String(gameController.tempQuote).split("");
-    chars.map(char => {
-        const tempCharElement = document.createElement("span");
-        tempCharElement.classList.add("word");
-        tempCharElement.innerText = char;
-        tempCharElement.id = `char-${gameController.baseChar}`;
-        gameElement.appendChild(tempCharElement);
-        gameController.baseChar++;
-    });
+    document.getElementById("wpm-result").innerText = String(wpm).slice(0, 5);
+    document.getElementById("accuracy-result").innerText = String(accuracy).slice(0, 5);
 }
+
+gameInputElement.addEventListener("blur", () => {
+    gamePause();
+});
+
+gameInputElement.addEventListener("keydown", ({ key }) => {
+    if (!gameController.start && (key !== ("Backspace" || "Shift"))) {
+        gameResume();
+    }
+
+    const { tempChar, totalChar, baseChar, correctChar, incorrectChar } = gameController;
+
+    if (incorrectChar > (baseChar / 5)) {
+        alert("You have made too many mistakes. Please try again.");
+        return gameSetup();
+    }
+    if (baseChar == totalChar && correctChar > (totalChar / 2)) return gameFinish();
+
+    const charElement = document.getElementById(`char-${totalChar}`) as HTMLElement;
+    const beforeCharElement = document.getElementById(`char-${totalChar - 1}`) as HTMLElement;
+    const afterCharElement = document.getElementById(`char-${totalChar + 1}`) as HTMLElement;
+
+    if ((key !== "Shift") && afterCharElement !== null) {
+        afterCharElement.classList.add("word-active");
+        afterCharElement.scrollIntoView();
+    }
+
+    if (key === tempChar[totalChar]) {
+        if(tempChar[totalChar] === " ") {
+            gameController.totalChar++;
+            gameController.correctChar++;
+            charElement.classList.remove("word-correct");
+            charElement.classList.remove("word-active");
+            gameInputElement.value = "";
+        } else {
+            charElement.classList.add("word-correct");
+            charElement.classList.remove("word-active");
+            gameController.totalChar++;
+            gameController.correctChar++;
+        }
+    } else if (key === "Backspace") {
+        if (totalChar > 0) {
+            gameController.totalChar--;
+            
+            if (beforeCharElement.classList.contains("word-correct")) {
+                beforeCharElement.classList.remove("word-correct");
+                beforeCharElement.classList.add("word-active");
+                gameController.correctChar--;
+            } else if (beforeCharElement.classList.contains("word-incorrect")) {
+                beforeCharElement.classList.remove("word-incorrect");
+                beforeCharElement.classList.add("word-active");
+            }
+
+            if (afterCharElement.classList.contains("word-correct")) {
+                afterCharElement.classList.remove("word-correct");
+            } else if (afterCharElement.classList.contains("word-incorrect")) {
+                afterCharElement.classList.remove("word-incorrect");
+            } else if (afterCharElement.classList.contains("word-active")) {
+                afterCharElement.classList.remove("word-active");
+            }
+
+            tempChar.map((char, index) => {
+                if (index >= totalChar) {
+                    document.getElementById(`char-${index}`).classList.remove("word-correct");
+                    document.getElementById(`char-${index}`).classList.remove("word-incorrect");
+                    document.getElementById(`char-${index}`).classList.remove("word-active");
+                }
+            });
+        }
+    } else if (key == "Shift") {
+        // do nothing
+    } else {
+        charElement.classList.remove("word-active");
+        charElement.classList.add("word-incorrect");
+        gameController.totalChar++;
+        gameController.incorrectChar++;
+    }
+});
 
 (gameSetup)()

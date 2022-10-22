@@ -5,6 +5,7 @@
     "allowJs": true,
     "outDir": "web/js/",
     "rootDir": "web/ts/",
+    "strict": false
   },
   "compileOnSave": true,
   "include": [

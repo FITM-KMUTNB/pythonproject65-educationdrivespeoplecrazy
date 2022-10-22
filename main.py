@@ -1,6 +1,13 @@
+import eel
+
 from os import system
 from random import choice
-import eel
+from datetime import datetime
+
+from tinydb import TinyDB, Query
+
+USER = TinyDB('private/user.json')
+LEADERBOARD = TinyDB('private/leaderboard.json')
 
 eel.init('web')
 
@@ -65,10 +72,74 @@ def getThiccQuote():
     quote = choice(thicc)
     return quote
 
+# Game Controller
 @eel.expose
 def resultCalc(correctChars: int, totalChars: int, time: int):
     wpm = (correctChars / 5) / (time / 60)
     accurary = (correctChars / totalChars) * 100
-    return wpm, accurary
+    cpm = correctChars / (time / 60)
+    return wpm, accurary, cpm
 
-eel.start('index.html', size=(800, 600), mode=None)
+# User Controller
+@eel.expose
+def checkUser(username: str):
+    User = Query()
+    result = USER.search(User.username == username)
+    if len(result) == 0:
+        return False
+    else:
+        return True
+
+@eel.expose
+def createUser(username: str):
+    USER.insert({ "username": username, "history": [] })
+    return True
+
+@eel.expose
+def getUserHistory(username: str):
+    User = Query()
+    result = USER.search(User.username == username)
+    return result[0]["history"]
+
+@eel.expose
+def updateUserHistory(username: str, wpm: int, accurary: int, cpm: int):
+    User = Query()
+    result = USER.search(User.username == username)
+    
+    history = result[0]["history"]
+    # Check if wpm is higher than the last one
+    if len(history) == 0:
+        history.append({ "wpm": wpm, "accurary": accurary, "cpm": cpm, "date": datetime.now().strftime("%d/%m/%Y %H:%M:%S") })
+
+        updateLeaderboard(username, wpm, accurary, cpm)
+        return True
+    else:
+        history.append({ "wpm": wpm, "accurary": accurary, "cpm": cpm, "date": datetime.now().strftime("%d/%m/%Y %H:%M:%S") })
+
+    USER.update({ "history": history }, Query().username == username)
+    tempData = {}
+    bestWpm = 0
+    for data in history:
+        if data["wpm"] > bestWpm:
+            bestWpm = data["wpm"]
+            tempData = {
+                "wpm": data["wpm"],
+                "accurary": data["accurary"],
+                "cpm": data["cpm"],
+                "date": data["date"]
+            }
+
+    updateLeaderboard(username, tempData["wpm"], tempData["accurary"], tempData["cpm"])
+
+# Leaderboard Controller
+@eel.expose
+def getLeaderboard():
+    return LEADERBOARD.all()
+
+def updateLeaderboard(username: str, wpm: int, accurary: int, cpm: int):
+    if LEADERBOARD.search(Query().username == username):
+        LEADERBOARD.update({ "wpm": wpm, "accurary": accurary, "cpm": cpm, "date": datetime.now().strftime("%d/%m/%Y %H:%M:%S") }, Query().username == username)
+    else:
+        LEADERBOARD.insert({ "username": username, "wpm": wpm, "accurary": accurary, "cpm": cpm, "date": datetime.now().strftime("%d/%m/%Y %H:%M:%S") })
+
+eel.start('index.html', size=(800, 600), mode=None, host="0.0.0.0")
