@@ -7,9 +7,5 @@ lib
 scripts
 pyvenv.cfg
 
+leaderboard.json
 user.json
-leaderbooard.json
-
-main.spec
-
-web/ts/*
