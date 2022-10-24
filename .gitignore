@@ -1,3 +1,5 @@
+build
+dist
 env
 include
 node_modules
@@ -5,5 +7,9 @@ lib
 scripts
 pyvenv.cfg
 
-private/user.json
-private/leaderbooard.json
+user.json
+leaderbooard.json
+
+main.spec
+
+web/ts/*
