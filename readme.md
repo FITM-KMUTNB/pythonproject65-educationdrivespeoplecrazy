@@ -13,13 +13,13 @@
 
 ## Create virtual environment
 ### Windows `(Git Bash)`
-- use `py -m venv venv` to create virtual environment
-- use `source venv\Scripts\activate` to activate virtual environment
+- use `py -m venv env` to create virtual environment
+- use `source ./env/Scripts/activate` to activate virtual environment
 - use `deactivate` to deactivate virtual environment
 
 ### Linux
-- use `python3 -m venv venv` to create virtual environment
-- use `source venv/bin/activate` to activate virtual environment
+- use `python3 -m venv env` to create virtual environment
+- use `source ./env/bin/activate` to activate virtual environment
 - use `deactivate` to deactivate virtual environment
 
 #### Check if virtual environment is activated
