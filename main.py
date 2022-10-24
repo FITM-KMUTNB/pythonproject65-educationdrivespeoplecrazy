@@ -6,8 +6,8 @@ from datetime import datetime
 
 from tinydb import TinyDB, Query
 
-USER = TinyDB('private/user.json')
-LEADERBOARD = TinyDB('private/leaderboard.json')
+USER = TinyDB('user.json')
+LEADERBOARD = TinyDB('leaderboard.json')
 
 eel.init('web')
 
@@ -19,7 +19,7 @@ eel.init('web')
 system("cls")
 
 def loadFile():
-    with open('private/quotes.txt', "r") as f:
+    with open('quotes.txt', "r") as f:
         return f.readlines()
 
 quotes = loadFile()
@@ -142,4 +142,4 @@ def updateLeaderboard(username: str, wpm: int, accurary: int, cpm: int):
     else:
         LEADERBOARD.insert({ "username": username, "wpm": wpm, "accurary": accurary, "cpm": cpm, "date": datetime.now().strftime("%d/%m/%Y %H:%M:%S") })
 
-eel.start('index.html', size=(800, 600), mode=None, host="0.0.0.0")
+eel.start('index.html', size=(800, 600))
