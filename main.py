@@ -97,12 +97,17 @@ def createUser(username: str):
 
 @eel.expose
 def getUserHistory(username: str):
-    User = Query()
-    result = USER.search(User.username == username)
-    return result[0]["history"]
+    if checkUser(username):
+        User = Query()
+        result = USER.search(User.username == username)
+        return result[0]["history"]
+    else:
+        return []
 
 @eel.expose
 def updateUserHistory(username: str, wpm: int, accurary: int, cpm: int):
+    if not checkUser(username):
+        return False
     User = Query()
     result = USER.search(User.username == username)
     

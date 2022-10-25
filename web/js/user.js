@@ -16,6 +16,7 @@ async function databaseCheck() {
         await eel.createUser(userInputElement.value)();
         window.localStorage.setItem('user', userInputElement.value);
     }
+    window.location.reload();
 }
 
 async function getUserHistory() {
@@ -36,7 +37,7 @@ document.getElementById("leaderboard-btn").addEventListener("click", async () =>
     const leaderboardOL = document.getElementById("leaderboard-ol");
     leaderboardOL.innerHTML = "";
     if (leaderboard.length === 0) {
-        leaderboardOL.classList.remove("list-group-numbered")
+        leaderboardOL.classList.remove("list-group-numbered");
         leaderboardOL.innerHTML = "<li class='list-group-item'>No data available</li>";
     } else {
         leaderboardOL.classList.add("list-group-numbered");
@@ -81,8 +82,10 @@ document.getElementById("history-btn").addEventListener("click", async () => {
     const historyOL = document.getElementById("history-ol");
     historyOL.innerHTML = "";
     if (history.length === 0) {
+        historyOL.classList.remove("list-group-numbered");
         historyOL.innerHTML = "<li class='list-group-item'>No data available</li>";
     } else {
+        historyOL.classList.add("list-group-numbered");
         history.map((entry) => {
             const li = document.createElement("li");
             li.classList.add("list-group-item");
@@ -96,7 +99,7 @@ document.getElementById("history-btn").addEventListener("click", async () => {
             span.classList.add("badge");
             span.classList.add("bg-primary");
             span.classList.add("rounded-pill");
-            span.innerText = `${entry.wpm} WPM / ${entry.accurary}% ACC / ${entry.cpm} CPM | ${entry.date}`;
+            span.innerText = `${String(entry.wpm).slice(0, 5)} WPM / ${String(entry.accurary).slice(0, 5)}% ACC / ${String(entry.cpm).slice(0, 5)} CPM`;
             li.appendChild(fontBold);
             li.appendChild(span);
             historyOL.appendChild(li);
