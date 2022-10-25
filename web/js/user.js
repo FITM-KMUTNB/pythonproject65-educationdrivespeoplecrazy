@@ -16,7 +16,7 @@ async function databaseCheck() {
         await eel.createUser(userInputElement.value)();
         window.localStorage.setItem('user', userInputElement.value);
     }
-    window.location.reload();
+    window.location.href = "index.html";
 }
 
 async function getUserHistory() {
@@ -71,6 +71,8 @@ document.getElementById("leaderboard-btn").addEventListener("click", async () =>
             span.innerText = `${String(entry.wpm).slice(0, 5)} WPM / ${String(entry.accurary).slice(0, 5)}% ACC / ${String(entry.cpm).slice(0, 5)} CPM`;
             div.appendChild(fontBold);
             div.appendChild(span);
+            // li.appendChild(fontBold);
+            // li.appendChild(span);
             li.appendChild(div);
             leaderboardOL.appendChild(li);
         });
@@ -92,6 +94,11 @@ document.getElementById("history-btn").addEventListener("click", async () => {
             li.classList.add("d-flex");
             li.classList.add("justify-content-between");
             li.classList.add("align-items-center");
+            const div = document.createElement("div");
+            div.classList.add("d-flex");
+            div.classList.add("justify-content-between");
+            div.classList.add("align-items-center");
+            div.style.width = "100%";
             const fontBold = document.createElement("div");
             fontBold.classList.add("fw-bold");
             fontBold.innerText = entry.date;
@@ -100,8 +107,9 @@ document.getElementById("history-btn").addEventListener("click", async () => {
             span.classList.add("bg-primary");
             span.classList.add("rounded-pill");
             span.innerText = `${String(entry.wpm).slice(0, 5)} WPM / ${String(entry.accurary).slice(0, 5)}% ACC / ${String(entry.cpm).slice(0, 5)} CPM`;
-            li.appendChild(fontBold);
-            li.appendChild(span);
+            div.appendChild(fontBold);
+            div.appendChild(span);
+            li.appendChild(div);
             historyOL.appendChild(li);
         });
     }

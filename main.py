@@ -106,6 +106,7 @@ def getUserHistory(username: str):
 
 @eel.expose
 def updateUserHistory(username: str, wpm: int, accurary: int, cpm: int):
+    firstTime = False
     if not checkUser(username):
         return False
     User = Query()
@@ -114,27 +115,17 @@ def updateUserHistory(username: str, wpm: int, accurary: int, cpm: int):
     history = result[0]["history"]
     # Check if wpm is higher than the last one
     if len(history) == 0:
-        history.append({ "wpm": wpm, "accurary": accurary, "cpm": cpm, "date": datetime.now().strftime("%d/%m/%Y %H:%M:%S") })
-
         updateLeaderboard(username, wpm, accurary, cpm)
-        return True
-    else:
-        history.append({ "wpm": wpm, "accurary": accurary, "cpm": cpm, "date": datetime.now().strftime("%d/%m/%Y %H:%M:%S") })
+        firstTime = True
+    history.append({ "wpm": wpm, "accurary": accurary, "cpm": cpm, "date": datetime.now().strftime("%d/%m/%Y %H:%M:%S") })
 
     USER.update({ "history": history }, Query().username == username)
-    tempData = {}
-    bestWpm = 0
-    for data in history:
-        if data["wpm"] > bestWpm:
-            bestWpm = data["wpm"]
-            tempData = {
-                "wpm": data["wpm"],
-                "accurary": data["accurary"],
-                "cpm": data["cpm"],
-                "date": data["date"]
-            }
-
-    updateLeaderboard(username, tempData["wpm"], tempData["accurary"], tempData["cpm"])
+    
+    if not firstTime:
+        High = Query()
+        result = LEADERBOARD.search(High.username == username)
+        if result[0]["wpm"] < wpm:
+            updateLeaderboard(username, wpm, accurary, cpm)
 
 # Leaderboard Controller
 @eel.expose
