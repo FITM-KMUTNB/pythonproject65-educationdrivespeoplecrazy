@@ -54,6 +54,10 @@ document.getElementById("leaderboard-btn").addEventListener("click", async () =>
             div.style.width = "100%";
             if (index === 0) {
                 li.classList.add("first");
+                const img = document.createElement("img");
+                img.src = "./images/1st-medal.png";
+                img.style.width = "30px";
+                li.appendChild(img);
             }
             else if (index === 1) {
                 li.classList.add("second");
