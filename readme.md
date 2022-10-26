@@ -32,6 +32,7 @@
 
 ## Usage
 - Run `python main.py` to start the application
+- If you want to build an executable file, run `py -m eel main.py web --onefile --noconsole --icon=./web/favicon.ico`
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)

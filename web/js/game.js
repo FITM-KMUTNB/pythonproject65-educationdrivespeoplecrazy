@@ -26,25 +26,20 @@ const modeSelector = {
     selector: ["short", "medium", "long", "thicc"]
 }
 
-modeSelector.selector.map(mode => {
-    modeSelector[mode].addEventListener("click", async () => {
-        gameController.mode = mode;
-        modeSelector.selector.map(mode => modeSelector[mode].classList.remove("active"));
-        modeSelector[mode].classList.add("active");
-        gameSetup();
-    });
-});
+modeSelector.selector.map(mode => modeSelector[mode].addEventListener("click", async () => {
+    gameController.mode = mode;
+    modeSelector.selector.map(modeTemp => modeSelector[modeTemp].classList.remove("active"));
+    modeSelector[mode].classList.add("active");
+    gameSetup();
+}));
 
-["btn-restart", "restart-btn"].map(id => {
-    document.getElementById(id).addEventListener("click", () => {
-        gameSetup();
-    });
-});
+["btn-restart", "restart-btn"].map(id => document.getElementById(id).addEventListener("click", gameSetup));
 
 const gameContainerElement = document.getElementById("game-container");
 const resultElement = document.getElementById("result");
 const gameElement = document.getElementById("game");
 const gameInputElement = document.getElementById("game-input");
+const timeDisplay = document.getElementById("time-display");
 
 async function gameSetup() {
     gameReset();
@@ -65,13 +60,14 @@ async function gameSetup() {
 function gameInterveal() {
     if (gameController.timeInterval.length <= 0) {
         gameController.timeInterval.push(setInterval(() => {
+            if (gameController.timeInterval.length > 1) {
+                gameController.timeInterval.map((interval, index) => index != 0 ? clearInterval(interval) : undefined);
+                gameController.timeInterval = [gameController.timeInterval[0]];
+            }
             if (gameController.start) {
                 gameController.time++;
             }
-            if (gameController.timeInterval.length > 1) {
-                gameController.timeInterval.map((interval, index) => index != 0 ? clearInterval(interval) : undefined);
-                gameController.timeInterval = [];
-            }
+            timeDisplay.innerText = gameController.time;
         }, 1000));
     }
 }
@@ -88,6 +84,7 @@ function gameResume() {
 }
 
 function gameReset() {
+    gameController.timeInterval.map(interval => clearInterval(interval));
     gameElement.innerHTML = "";
     gameInputElement.value = "";
     gameInputElement.disabled = false;
@@ -102,6 +99,7 @@ function gameReset() {
     gameController.start = false;
     gameContainerElement.classList.remove("d-none");
     resultElement.classList.add("d-none");
+    timeDisplay.innerText = 0;
 }
 
 async function gameFinish() {
