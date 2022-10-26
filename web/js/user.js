@@ -55,15 +55,26 @@ document.getElementById("leaderboard-btn").addEventListener("click", async () =>
             if (index === 0) {
                 li.classList.add("first");
                 const img = document.createElement("img");
-                img.src = "./images/1st-medal.png";
+                img.src = "./images/gold-medal.png";
                 img.style.width = "30px";
+                img.style.marginLeft = "2px";
                 li.appendChild(img);
             }
             else if (index === 1) {
                 li.classList.add("second");
+                const img = document.createElement("img");
+                img.src = "./images/silver-medal.png";
+                img.style.width = "30px";
+                img.style.marginLeft = "2px";
+                li.appendChild(img);
             }
             else if (index === 2) {
                 li.classList.add("third");
+                const img = document.createElement("img");
+                img.src = "./images/bronze-medal.png";
+                img.style.width = "30px";
+                img.style.marginLeft = "2px";
+                li.appendChild(img);
             }
             const fontBold = document.createElement("div");
             fontBold.classList.add("fw-bold");
