@@ -24,7 +24,7 @@
         .list-group-numbered>.list-group-item::before {
             width: 1em;
             text-align: center;
-            margin-right: 1em;
+            margin-right: .5em;
         }
     </style>
 
@@ -87,7 +87,7 @@
             <div id="game" style="height: 9rem;max-width: 1024px;overflow-y: auto;"></div>
             <div class="input-group mb-3 mt-3">
                 <input type="text" id="game-input" class="form-control" autocomplete="off">
-                <span class="input-group-text" id="time-display">0</span>
+                <span class="input-group-text" style="margin: -1px;" id="time-display">0</span>
                 <button class="btn btn-secondary" id="btn-restart">Restart</button>
             </div>
         </div>
