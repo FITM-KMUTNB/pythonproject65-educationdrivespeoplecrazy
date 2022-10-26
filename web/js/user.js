@@ -3,6 +3,7 @@ const userSigninCache = window.localStorage.getItem('user');
 
 if (userSigninCache) {
     userInputElement.value = userSigninCache;
+    databaseCheck();
 } else {
     document.getElementById("history-btn").classList.add("d-none");
 }
@@ -16,7 +17,6 @@ async function databaseCheck() {
         await eel.createUser(userInputElement.value)();
         window.localStorage.setItem('user', userInputElement.value);
     }
-    window.location.href = "index.html";
 }
 
 async function getUserHistory() {
@@ -71,8 +71,6 @@ document.getElementById("leaderboard-btn").addEventListener("click", async () =>
             span.innerText = `${String(entry.wpm).slice(0, 5)} WPM / ${String(entry.accurary).slice(0, 5)}% ACC / ${String(entry.cpm).slice(0, 5)} CPM`;
             div.appendChild(fontBold);
             div.appendChild(span);
-            // li.appendChild(fontBold);
-            // li.appendChild(span);
             li.appendChild(div);
             leaderboardOL.appendChild(li);
         });
@@ -115,4 +113,8 @@ document.getElementById("history-btn").addEventListener("click", async () => {
     }
 });
 
-document.getElementById("user-save").addEventListener("click", () => databaseCheck());
+document.getElementById("user-save").addEventListener("click", () => {
+    databaseCheck();
+    window.location.reload();
+});
+(databaseCheck)()
