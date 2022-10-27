@@ -1,11 +1,29 @@
 const userInputElement = document.getElementById('user-input');
 const userSigninCache = window.localStorage.getItem('user');
 
+userInputElement.addEventListener("keydown", key => {
+    if (key.key === "Enter") {
+        databaseCheck();
+        window.location.reload();
+    }
+});
+
+document.getElementById("user-save").addEventListener("click", () => {
+    databaseCheck();
+    window.location.reload();
+});
+
+document.getElementById("user-reset").addEventListener("click", () => {
+    window.localStorage.removeItem('user');
+    window.location.reload();
+});
+
 if (userSigninCache) {
     userInputElement.value = userSigninCache;
     databaseCheck();
 } else {
     document.getElementById("history-btn").classList.add("d-none");
+    document.getElementById("user-reset").classList.add("d-none");
 }
 
 async function databaseCheck() {
@@ -128,8 +146,4 @@ document.getElementById("history-btn").addEventListener("click", async () => {
     }
 });
 
-document.getElementById("user-save").addEventListener("click", () => {
-    databaseCheck();
-    window.location.reload();
-});
 (databaseCheck)()
