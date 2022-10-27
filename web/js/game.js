@@ -133,7 +133,7 @@ gameInputElement.addEventListener("keydown", ({ key }) => {
     const charElement = document.getElementById(`char-${totalChar}`);
     const beforeCharElement = document.getElementById(`char-${totalChar - 1}`);
     const afterCharElement = document.getElementById(`char-${totalChar + 1}`);
-    if ((key != "Shift") && afterCharElement !== null) {
+    if (!(key == "Shift" || key == "Tab" || key == "CapsLock" || key == "Control" || key == "Alt" || key == "Meta" || key == "ArrowLeft" || key == "ArrowRight" || key == "ArrowUp" || key == "ArrowDown") && afterCharElement !== null) {
         afterCharElement.classList.add("word-active");
         afterCharElement.scrollIntoView();
     }
@@ -182,8 +182,11 @@ gameInputElement.addEventListener("keydown", ({ key }) => {
             });
         }
     }
-    else if (key == "Shift") {
+    else if (key == "Shift" || key == "Tab" || key == "CapsLock" || key == "Control" || key == "Alt" || key == "Meta" || key == "ArrowLeft" || key == "ArrowRight" || key == "ArrowUp" || key == "ArrowDown") {
         // do nothing
+    }
+    else if (key == "Escape") {
+        gameSetup();
     }
     else {
         charElement.classList.remove("word-active");
