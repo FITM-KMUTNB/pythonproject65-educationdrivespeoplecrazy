@@ -92,7 +92,8 @@ def checkUser(username: str):
 
 @eel.expose
 def createUser(username: str):
-    USER.insert({ "username": username, "history": [] })
+    if not checkUser(username) and len(username) > 4:
+        USER.insert({ "username": username, "history": [] })
     return True
 
 @eel.expose
@@ -119,7 +120,7 @@ def updateUserHistory(username: str, wpm: int, accuracy: int, cpm: int):
         firstTime = True
     history.append({ "wpm": wpm, "accuracy": accuracy, "cpm": cpm, "date": datetime.now().strftime("%d/%m/%Y %H:%M:%S") })
 
-    USER.update({ "history": history }, Query().username == username)
+    USER.update({ "history": history }, User.username == username)
     
     if not firstTime:
         High = Query()

@@ -33,6 +33,22 @@
 ## Usage
 - Run `python main.py` to start the application
 - If you want to build an executable file, run `py -m eel main.py web --onefile --noconsole --icon=./web/favicon.ico`
+- executable file will be in the `dist` folder
+
+### On startup
+- First time you start the application, application will create a `user.json` and `leaderboard.json` file to store user data and leaderboard data
+- If you want to reset the application, delete the `user.json` and `leaderboard.json` file and restart the application
+
+### Game
+- You can choose between 4 different game modes [ `Short`, `Medium`, `Long`, `Thicc` ]
+- Game starts when you press any key on your keyboard `Check an input element is focused`
+- Game ends when you finish the text
+- Game reset when you press `Esc` key or click on `Reset` button
+- Game will show your typing speed in `WPM` (words per minute) and `Accuracy` (percentage of correct characters)
+### User
+- You can change your username in navigation bar on the top right
+- You can view your statistics in navigation bar on history menu
+- You can view your leaderboard in navigation bar on leaderboard menu
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)

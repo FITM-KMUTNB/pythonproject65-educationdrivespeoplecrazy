@@ -108,7 +108,7 @@ async function gameFinish() {
     const { correctChar, incorrectChar, time } = gameController;
     const [wpm, accuracy, cpm] = await eel.resultCalc(correctChar, (correctChar + incorrectChar), time)();
     const user = window.localStorage.getItem("user");
-    if (user !== null) {
+    if (user?.length > 4) {
         await eel.updateUserHistory(user, wpm, accuracy, cpm)();
     }
     document.getElementById("wpm-result").innerText = String(wpm).slice(0, 5);
