@@ -133,11 +133,29 @@ gameInputElement.addEventListener("keydown", ({ key }) => {
     const charElement = document.getElementById(`char-${totalChar}`);
     const beforeCharElement = document.getElementById(`char-${totalChar - 1}`);
     const afterCharElement = document.getElementById(`char-${totalChar + 1}`);
-    if (!(key == "Shift" || key == "Tab" || key == "CapsLock" || key == "Control" || key == "Alt" || key == "Meta" || key == "ArrowLeft" || key == "ArrowRight" || key == "ArrowUp" || key == "ArrowDown") && afterCharElement !== null) {
+    if (!(key == "Shift" || key == "Tab" || key == "CapsLock" || key == "Control" || key == "Alt" || key == "Meta" || key == "ArrowLeft" || key == "ArrowRight" || key == "ArrowUp" || key == "ArrowDown" || key === "Backspace") && afterCharElement !== null) {
         afterCharElement.classList.add("word-active");
         afterCharElement.scrollIntoView();
     }
-    if (key === tempChar[totalChar]) {
+    if (key === "Backspace") {
+        if (totalChar > 0) {
+            gameController.totalChar--;
+            if (beforeCharElement) {
+                beforeCharElement.classList.remove("word-correct");
+                beforeCharElement.classList.remove("word-incorrect");
+                beforeCharElement.classList.add("word-active");
+                gameController.correctChar--;
+            }
+            tempChar.map((char, index) => {
+                if (index >= totalChar) {
+                    document.getElementById(`char-${index}`).classList.remove("word-correct");
+                    document.getElementById(`char-${index}`).classList.remove("word-incorrect");
+                    document.getElementById(`char-${index}`).classList.remove("word-active");
+                }
+            });
+        }
+    }
+    else if (key === tempChar[totalChar]) {
         if (tempChar[totalChar] === " ") {
             gameController.totalChar++;
             gameController.correctChar++;
@@ -150,36 +168,6 @@ gameInputElement.addEventListener("keydown", ({ key }) => {
             charElement.classList.remove("word-active");
             gameController.totalChar++;
             gameController.correctChar++;
-        }
-    }
-    else if (key === "Backspace") {
-        if (totalChar > 0) {
-            gameController.totalChar--;
-            if (beforeCharElement.classList.contains("word-correct")) {
-                beforeCharElement.classList.remove("word-correct");
-                beforeCharElement.classList.add("word-active");
-                gameController.correctChar--;
-            }
-            else if (beforeCharElement.classList.contains("word-incorrect")) {
-                beforeCharElement.classList.remove("word-incorrect");
-                beforeCharElement.classList.add("word-active");
-            }
-            if (afterCharElement.classList.contains("word-correct")) {
-                afterCharElement.classList.remove("word-correct");
-            }
-            else if (afterCharElement.classList.contains("word-incorrect")) {
-                afterCharElement.classList.remove("word-incorrect");
-            }
-            else if (afterCharElement.classList.contains("word-active")) {
-                afterCharElement.classList.remove("word-active");
-            }
-            tempChar.map((char, index) => {
-                if (index >= totalChar) {
-                    document.getElementById(`char-${index}`).classList.remove("word-correct");
-                    document.getElementById(`char-${index}`).classList.remove("word-incorrect");
-                    document.getElementById(`char-${index}`).classList.remove("word-active");
-                }
-            });
         }
     }
     else if (key == "Shift" || key == "Tab" || key == "CapsLock" || key == "Control" || key == "Alt" || key == "Meta" || key == "ArrowLeft" || key == "ArrowRight" || key == "ArrowUp" || key == "ArrowDown") {

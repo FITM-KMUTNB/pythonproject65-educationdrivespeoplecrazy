@@ -44,9 +44,6 @@ async function getUserHistory() {
 
 async function getLeaderboard() {
     let leaderboard = await eel.getLeaderboard()();
-    leaderboard = leaderboard.sort((a, b) => {
-        return b.wpm - a.wpm;
-    });
     return leaderboard;
 }
 
@@ -70,26 +67,10 @@ document.getElementById("leaderboard-btn").addEventListener("click", async () =>
             div.classList.add("justify-content-between");
             div.classList.add("align-items-center");
             div.style.width = "100%";
-            if (index === 0) {
-                li.classList.add("first");
+            if (index < 3) {
+                li.classList.add(index == 0 ? "first" : index == 1 ? "second" : "third");
                 const img = document.createElement("img");
-                img.src = "./images/gold-medal.png";
-                img.style.width = "30px";
-                img.style.marginLeft = "2px";
-                li.appendChild(img);
-            }
-            else if (index === 1) {
-                li.classList.add("second");
-                const img = document.createElement("img");
-                img.src = "./images/silver-medal.png";
-                img.style.width = "30px";
-                img.style.marginLeft = "2px";
-                li.appendChild(img);
-            }
-            else if (index === 2) {
-                li.classList.add("third");
-                const img = document.createElement("img");
-                img.src = "./images/bronze-medal.png";
+                img.src = `./images/${index == 0 ? "gold" : index == 1 ? "silver" : "bronze"}-medal.png`;
                 img.style.width = "30px";
                 img.style.marginLeft = "2px";
                 li.appendChild(img);
@@ -101,7 +82,7 @@ document.getElementById("leaderboard-btn").addEventListener("click", async () =>
             span.classList.add("badge");
             span.classList.add("bg-primary");
             span.classList.add("rounded-pill");
-            span.innerText = `${String(entry.wpm).slice(0, 5)} WPM / ${String(entry.accurary).slice(0, 5)}% ACC / ${String(entry.cpm).slice(0, 5)} CPM`;
+            span.innerText = `${entry.wpm} WPM / ${entry.accuracy}%`;
             div.appendChild(fontBold);
             div.appendChild(span);
             li.appendChild(div);
@@ -137,7 +118,7 @@ document.getElementById("history-btn").addEventListener("click", async () => {
             span.classList.add("badge");
             span.classList.add("bg-primary");
             span.classList.add("rounded-pill");
-            span.innerText = `${String(entry.wpm).slice(0, 5)} WPM / ${String(entry.accurary).slice(0, 5)}% ACC / ${String(entry.cpm).slice(0, 5)} CPM`;
+            span.innerText = `${entry.wpm} WPM / ${entry.accuracy}%`;
             div.appendChild(fontBold);
             div.appendChild(span);
             li.appendChild(div);

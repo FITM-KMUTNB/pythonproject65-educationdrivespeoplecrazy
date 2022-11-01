@@ -76,9 +76,9 @@ def getThiccQuote():
 @eel.expose
 def resultCalc(correctChars: int, totalChars: int, time: int):
     wpm = (correctChars / 5) / (time / 60)
-    accurary = (correctChars / totalChars) * 100
+    accuracy = (correctChars / totalChars) * 100
     cpm = correctChars / (time / 60)
-    return wpm, accurary, cpm
+    return round(wpm, 2), round(accuracy, 2), round(cpm, 2)
 
 # User Controller
 @eel.expose
@@ -105,7 +105,7 @@ def getUserHistory(username: str):
         return []
 
 @eel.expose
-def updateUserHistory(username: str, wpm: int, accurary: int, cpm: int):
+def updateUserHistory(username: str, wpm: int, accuracy: int, cpm: int):
     firstTime = False
     if not checkUser(username):
         return False
@@ -115,9 +115,9 @@ def updateUserHistory(username: str, wpm: int, accurary: int, cpm: int):
     history = result[0]["history"]
     # Check if wpm is higher than the last one
     if len(history) == 0:
-        updateLeaderboard(username, wpm, accurary, cpm)
+        updateLeaderboard(username, wpm, accuracy, cpm)
         firstTime = True
-    history.append({ "wpm": wpm, "accurary": accurary, "cpm": cpm, "date": datetime.now().strftime("%d/%m/%Y %H:%M:%S") })
+    history.append({ "wpm": wpm, "accuracy": accuracy, "cpm": cpm, "date": datetime.now().strftime("%d/%m/%Y %H:%M:%S") })
 
     USER.update({ "history": history }, Query().username == username)
     
@@ -125,17 +125,17 @@ def updateUserHistory(username: str, wpm: int, accurary: int, cpm: int):
         High = Query()
         result = LEADERBOARD.search(High.username == username)
         if result[0]["wpm"] < wpm:
-            updateLeaderboard(username, wpm, accurary, cpm)
+            updateLeaderboard(username, wpm, accuracy, cpm)
 
 # Leaderboard Controller
 @eel.expose
 def getLeaderboard():
-    return LEADERBOARD.all()
+    return sorted(LEADERBOARD.all(), key=lambda k: k['wpm'], reverse=True)
 
-def updateLeaderboard(username: str, wpm: int, accurary: int, cpm: int):
+def updateLeaderboard(username: str, wpm: int, accuracy: int, cpm: int):
     if LEADERBOARD.search(Query().username == username):
-        LEADERBOARD.update({ "wpm": wpm, "accurary": accurary, "cpm": cpm, "date": datetime.now().strftime("%d/%m/%Y %H:%M:%S") }, Query().username == username)
+        LEADERBOARD.update({ "wpm": wpm, "accuracy": accuracy, "cpm": cpm, "date": datetime.now().strftime("%d/%m/%Y %H:%M:%S") }, Query().username == username)
     else:
-        LEADERBOARD.insert({ "username": username, "wpm": wpm, "accurary": accurary, "cpm": cpm, "date": datetime.now().strftime("%d/%m/%Y %H:%M:%S") })
+        LEADERBOARD.insert({ "username": username, "wpm": wpm, "accuracy": accuracy, "cpm": cpm, "date": datetime.now().strftime("%d/%m/%Y %H:%M:%S") })
 
 eel.start('index.html', size=(800, 600))
