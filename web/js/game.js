@@ -2,7 +2,7 @@ const gameController = {
     mode: "medium",
     correctChar: 0,
     incorrectChar: 0,
-    totalChar: 0,
+    indeChar: 0,
     tempChar: [],
     time: 0,
     timeInterval: null,
@@ -64,7 +64,7 @@ function gameReset() {
     gameInputElement.disabled = false;
     gameController.correctChar = 0;
     gameController.incorrectChar = 0;
-    gameController.totalChar = 0;
+    gameController.indexChar = 0;
     gameController.tempChar = [];
     gameController.time = 0;
     gameController.timeInterval = null;
@@ -81,9 +81,7 @@ async function gameFinish() {
     const { correctChar, incorrectChar, time } = gameController;
     const [wpm, accuracy, cpm] = await eel.resultCalc(correctChar, (correctChar + incorrectChar), time)();
     const user = window.localStorage.getItem("user");
-    if (user?.length > 4) {
-        await eel.updateUserHistory(user, wpm, accuracy, cpm)();
-    }
+    if (user?.length > 4) await eel.updateUserHistory(user, wpm, accuracy, cpm)();
     document.getElementById("wpm-result").innerText = wpm;
     document.getElementById("accuracy-result").innerText = accuracy;
 }
@@ -96,18 +94,18 @@ gameInputElement.addEventListener("keydown", ({ key }) => {
     if (!gameController.start && (key.length != 1 || key === " ")) gameController.start = true;
 
     const classList = ["word-active", "word-correct", "word-incorrect"];
-    const { tempChar, totalChar, correctChar, incorrectChar } = gameController;
+    const { tempChar, indexChar, correctChar, incorrectChar } = gameController;
 
     if (incorrectChar > (tempChar.length / 5)) {
         alert("You have made too many mistakes. Please try again.");
         return gameSetup();
     }
 
-    if (tempChar.length == (totalChar + 1) && correctChar > (totalChar / 2)) return gameFinish();
+    if (tempChar.length == (indexChar + 1) && correctChar > (indexChar / 2)) return gameFinish();
 
-    const charElement = document.getElementById(`char-${totalChar}`);
-    const beforeCharElement = document.getElementById(`char-${totalChar - 1}`);
-    const afterCharElement = document.getElementById(`char-${totalChar + 1}`);
+    const charElement = document.getElementById(`char-${indexChar}`);
+    const beforeCharElement = document.getElementById(`char-${indexChar - 1}`);
+    const afterCharElement = document.getElementById(`char-${indexChar + 1}`);
 
     if (!(key == "Shift" || key == "Tab" || key == "CapsLock" || key == "Control" || key == "Alt" || key == "Meta" || key == "ArrowLeft" || key == "ArrowRight" || key == "ArrowUp" || key == "ArrowDown" || key === "Backspace") && afterCharElement !== null) {
         afterCharElement.classList.add("word-active");
@@ -115,25 +113,25 @@ gameInputElement.addEventListener("keydown", ({ key }) => {
     }
 
     if (key === "Backspace") {
-        if (totalChar > 0) {
-            gameController.totalChar--;
+        if (indexChar > 0) {
+            gameController.indexChar--;
             if (beforeCharElement) {
                 beforeCharElement.classList.remove(...classList);
                 beforeCharElement.classList.add("word-active");
                 gameController.correctChar--;
             }
-            tempChar.filter((char, index) => index != totalChar).map((char, index) => index >= totalChar ? document.getElementById(`char-${index}`).classList.remove(...classList) : null);
+            tempChar.filter((_char, index) => index != indexChar).map((_char, index) => index >= indexChar ? document.getElementById(`char-${index}`).classList.remove(...classList) : null);
         }
     }
-    else if (key === tempChar[totalChar]) {
-        if (tempChar[totalChar] === " ") {
-            gameController.totalChar++;
+    else if (key === tempChar[indexChar]) {
+        if (tempChar[indexChar] === " ") {
+            gameController.indexChar++;
             gameController.correctChar++;
             gameInputElement.value = "";
         }
         else {
             charElement.classList.add("word-correct");
-            gameController.totalChar++;
+            gameController.indexChar++;
             gameController.correctChar++;
         }
         charElement.classList.remove("word-active");
@@ -147,7 +145,7 @@ gameInputElement.addEventListener("keydown", ({ key }) => {
     else {
         charElement.classList.remove("word-active");
         charElement.classList.add("word-incorrect");
-        gameController.totalChar++;
+        gameController.indexChar++;
         gameController.incorrectChar++;
     }
 });
