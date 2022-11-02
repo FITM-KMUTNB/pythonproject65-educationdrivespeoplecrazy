@@ -1,13 +1,11 @@
 const gameController = {
     mode: "medium",
-    baseChar: 0,
     correctChar: 0,
     incorrectChar: 0,
     totalChar: 0,
-    tempQuote: "",
     tempChar: [],
     time: 0,
-    timeInterval: [],
+    timeInterval: null,
     start: false
 }
 
@@ -18,20 +16,16 @@ const quote = {
     thicc: () => eel.getThiccQuote()()
 }
 
-const modeSelector = {
-    short: document.getElementById("mode-short"),
-    medium: document.getElementById("mode-medium"),
-    long: document.getElementById("mode-long"),
-    thicc: document.getElementById("mode-thicc"),
-    selector: ["short", "medium", "long", "thicc"]
-}
-
-modeSelector.selector.map(mode => modeSelector[mode].addEventListener("click", async () => {
-    gameController.mode = mode;
-    modeSelector.selector.map(modeTemp => modeSelector[modeTemp].classList.remove("active"));
-    modeSelector[mode].classList.add("active");
-    gameSetup();
-}));
+const selector = ["short", "medium", "long", "thicc"];
+selector.map(mode => {
+    const element = document.getElementById(`mode-${mode}`);
+    element.addEventListener("click", async () => {
+        gameController.mode = mode;
+        selector.map(modeTemp => document.getElementById(`mode-${modeTemp}`).classList.remove("active"));
+        element.classList.add("active");
+        gameSetup();
+    });
+});
 
 ["btn-restart", "restart-btn"].map(id => document.getElementById(id).addEventListener("click", gameSetup));
 
@@ -43,60 +37,39 @@ const timeDisplay = document.getElementById("time-display");
 
 async function gameSetup() {
     gameReset();
-    gameController.tempQuote = await quote[gameController.mode]();
-    gameController.tempChar = String(gameController.tempQuote).split("");
+    const tempQuote = await quote[gameController.mode]();
+    gameController.tempChar = String(tempQuote).split("");
     gameController.tempChar.map((char, index) => {
         const charElement = document.createElement("span");
         charElement.id = `char-${index}`;
         charElement.classList.add("word");
         charElement.innerText = char;
         gameElement.appendChild(charElement);
-        gameController.baseChar += 1;
     });
     gameInputElement.focus();
     document.getElementById("char-0").classList.add("word-active");
-}
 
-function gameInterveal() {
-    if (gameController.timeInterval.length <= 0) {
-        gameController.timeInterval.push(setInterval(() => {
-            if (gameController.timeInterval.length > 1) {
-                gameController.timeInterval.map((interval, index) => index != 0 ? clearInterval(interval) : undefined);
-                gameController.timeInterval = [gameController.timeInterval[0]];
-            }
-            if (gameController.start) {
-                gameController.time++;
-            }
+    gameController.timeInterval = setInterval(() => {
+        if (gameController.start) {
+            gameController.time += 1;
             timeDisplay.innerText = gameController.time;
-        }, 1000));
-    }
-}
-
-function gamePause() {
-    gameController.start = false;
-    gameController.timeInterval.map(interval => clearInterval(interval));
-    gameController.timeInterval = [];
-}
-
-function gameResume() {
-    gameController.start = true;
-    gameInterveal();
+        }
+    }, 1000);
 }
 
 function gameReset() {
-    gameController.timeInterval.map(interval => clearInterval(interval));
+    clearInterval(gameController.timeInterval);
     gameElement.innerHTML = "";
     gameInputElement.value = "";
     gameInputElement.disabled = false;
-    gameController.baseChar = 0;
     gameController.correctChar = 0;
     gameController.incorrectChar = 0;
     gameController.totalChar = 0;
-    gameController.tempQuote = "";
     gameController.tempChar = [];
     gameController.time = 0;
-    gameController.timeInterval = [];
+    gameController.timeInterval = null;
     gameController.start = false;
+    
     gameContainerElement.classList.remove("d-none");
     resultElement.classList.add("d-none");
     timeDisplay.innerText = 0;
@@ -111,64 +84,59 @@ async function gameFinish() {
     if (user?.length > 4) {
         await eel.updateUserHistory(user, wpm, accuracy, cpm)();
     }
-    document.getElementById("wpm-result").innerText = String(wpm).slice(0, 5);
-    document.getElementById("accuracy-result").innerText = String(accuracy).slice(0, 5);
+    document.getElementById("wpm-result").innerText = wpm;
+    document.getElementById("accuracy-result").innerText = accuracy;
 }
 
 gameInputElement.addEventListener("blur", () => {
-    gamePause();
+    gameController.start = false;
 });
 
 gameInputElement.addEventListener("keydown", ({ key }) => {
-    if (!gameController.start && (key.length != 1 || key === " ")) {
-        gameResume();
-    }
-    const { tempChar, totalChar, baseChar, correctChar, incorrectChar } = gameController;
-    if (incorrectChar > (baseChar / 5)) {
+    if (!gameController.start && (key.length != 1 || key === " ")) gameController.start = true;
+
+    const classList = ["word-active", "word-correct", "word-incorrect"];
+    const { tempChar, totalChar, correctChar, incorrectChar } = gameController;
+
+    if (incorrectChar > (tempChar.length / 5)) {
         alert("You have made too many mistakes. Please try again.");
         return gameSetup();
     }
-    if (baseChar == (totalChar + 1) && correctChar > (totalChar / 2))
-        return gameFinish();
+
+    if (tempChar.length == (totalChar + 1) && correctChar > (totalChar / 2)) return gameFinish();
+
     const charElement = document.getElementById(`char-${totalChar}`);
     const beforeCharElement = document.getElementById(`char-${totalChar - 1}`);
     const afterCharElement = document.getElementById(`char-${totalChar + 1}`);
+
     if (!(key == "Shift" || key == "Tab" || key == "CapsLock" || key == "Control" || key == "Alt" || key == "Meta" || key == "ArrowLeft" || key == "ArrowRight" || key == "ArrowUp" || key == "ArrowDown" || key === "Backspace") && afterCharElement !== null) {
         afterCharElement.classList.add("word-active");
         afterCharElement.scrollIntoView();
     }
+
     if (key === "Backspace") {
         if (totalChar > 0) {
             gameController.totalChar--;
             if (beforeCharElement) {
-                beforeCharElement.classList.remove("word-correct");
-                beforeCharElement.classList.remove("word-incorrect");
+                beforeCharElement.classList.remove(...classList);
                 beforeCharElement.classList.add("word-active");
                 gameController.correctChar--;
             }
-            tempChar.map((char, index) => {
-                if (index >= totalChar) {
-                    document.getElementById(`char-${index}`).classList.remove("word-correct");
-                    document.getElementById(`char-${index}`).classList.remove("word-incorrect");
-                    document.getElementById(`char-${index}`).classList.remove("word-active");
-                }
-            });
+            tempChar.filter((char, index) => index != totalChar).map((char, index) => index >= totalChar ? document.getElementById(`char-${index}`).classList.remove(...classList) : null);
         }
     }
     else if (key === tempChar[totalChar]) {
         if (tempChar[totalChar] === " ") {
             gameController.totalChar++;
             gameController.correctChar++;
-            charElement.classList.remove("word-correct");
-            charElement.classList.remove("word-active");
             gameInputElement.value = "";
         }
         else {
             charElement.classList.add("word-correct");
-            charElement.classList.remove("word-active");
             gameController.totalChar++;
             gameController.correctChar++;
         }
+        charElement.classList.remove("word-active");
     }
     else if (key == "Shift" || key == "Tab" || key == "CapsLock" || key == "Control" || key == "Alt" || key == "Meta" || key == "ArrowLeft" || key == "ArrowRight" || key == "ArrowUp" || key == "ArrowDown") {
         // do nothing
