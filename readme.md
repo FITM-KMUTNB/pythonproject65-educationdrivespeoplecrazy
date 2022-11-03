@@ -40,15 +40,25 @@
 - If you want to reset the application, delete the `user.json` and `leaderboard.json` file and restart the application
 
 ### Game
-- You can choose between 4 different game modes [ `Short`, `Medium`, `Long`, `Thicc` ]
+![typingeedit!](/images/typingedit1.png)
+
+This is a game that tells your typing speed and accuracy.
+There is also a leaderboard to compete with your friends who is faster.
+
 - Game starts when you press any key on your keyboard `Check an input element is focused`
 - Game ends when you finish the text
-- Game reset when you press `Esc` key or click on `Reset` button
 - Game will show your typing speed in `WPM` (words per minute) and `Accuracy` (percentage of correct characters)
-### User
-- You can change your username in navigation bar on the top right
-- You can view your statistics in navigation bar on history menu
-- You can view your leaderboard in navigation bar on leaderboard menu
+
+1. You can view your leaderboard in navigation bar on leaderboard menu
+2. You can view your statistics in navigation bar on history menu
+3. Enter your name in the box and press save before typing.
+Your name will be on the leaderboard after typing.
+4. Game reset when you press `Esc` key or click on `Reset` button
+5. You can choose between 4 different game modes [ `Short`, `Medium`, `Long`, `Thicc` ]
+6. You can restart quotes by pressing Restart button.
+
+
+
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
