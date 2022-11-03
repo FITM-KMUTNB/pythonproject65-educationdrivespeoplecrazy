@@ -1,0 +1,11 @@
+build
+# dist
+env
+include
+node_modules
+lib
+scripts
+pyvenv.cfg
+
+*.json
+*.spec

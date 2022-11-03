@@ -1,0 +1,17 @@
+.list-group-numbered>.list-group-item::before {
+    width: 1em;
+    text-align: center;
+    margin-right: .5em;
+}
+
+.first {
+    background-color: #b8860b;
+}
+
+.second {
+    background-color: #a9a9a9;
+}
+
+.third {
+    background-color: #8b4513;
+}
