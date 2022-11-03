@@ -139,4 +139,4 @@ def updateLeaderboard(username: str, wpm: int, accuracy: int, cpm: int):
     else:
         LEADERBOARD.insert({ "username": username, "wpm": wpm, "accuracy": accuracy, "cpm": cpm, "date": datetime.now().strftime("%d/%m/%Y %H:%M:%S") })
 
-eel.start('index.html', size=(1280 // 1.3, 720 // 1.1))
+eel.start('index.html', size=(1280 // 1.3, 720))
