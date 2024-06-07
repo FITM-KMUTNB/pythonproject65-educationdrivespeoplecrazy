@@ -11,11 +11,6 @@ LEADERBOARD = TinyDB('leaderboard.json')
 
 eel.init('web')
 
-# Stort 20
-# Medium 60
-# Long 100
-# Thicc 100+
-
 system("cls")
 
 def loadFile():
